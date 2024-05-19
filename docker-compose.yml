@@ -3,7 +3,7 @@ x-environment: &airflow_environment
   - AIRFLOW__CORE__EXECUTOR=LocalExecutor
   - AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS=False
   - AIRFLOW__CORE__LOAD_EXAMPLES=False
-  - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://airflow:airflow@postgres:5432/airflow
+  - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql://${AIRFLOWDB_USER}:${AIRFLOWDB_PASSWORD}@${AIRFLOWDB_SERVICE_NAME}:5432/${AIRFLOWDB_NAME}
   - AIRFLOW__CORE__STORE_DAG_CODE=True
   - AIRFLOW__CORE__STORE_SERIALIZED_DAGS=True
   - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
@@ -13,12 +13,12 @@ x-airflow-image: &airflow_image apache/airflow:2.9.0-python3.10
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
-  postgres:
+  ${AIRFLOWDB_SERVICE_NAME}:
     image: postgres:13
     environment:
-      - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=airflow
-      - POSTGRES_DB=airflow
+      - POSTGRES_USER=${AIRFLOWDB_USER}
+      - POSTGRES_PASSWORD=${AIRFLOWDB_PASSWORD}
+      - POSTGRES_DB=${AIRFLOWDB_NAME}
     ports:
       - "5432:5432"
     volumes:
@@ -33,7 +33,7 @@ services:
     container_name: helloAirflow_init
     restart: always
     depends_on:
-      - postgres
+      - ${AIRFLOWDB_SERVICE_NAME}
     environment: *airflow_environment
     entrypoint: /bin/bash
     command: -c 'airflow db init && airflow users create --username admin --password admin --firstname Anonymous --lastname Admin --role Admin --email admin@example.org'
@@ -47,7 +47,7 @@ services:
     container_name: helloAirflow_webserver 
     restart: always
     depends_on:
-      - postgres
+      - ${AIRFLOWDB_SERVICE_NAME}
     ports:
       - "8080:8080"
     volumes:
@@ -64,7 +64,7 @@ services:
     container_name: helloAirflow_scheduler 
     restart: always
     depends_on:
-      - postgres
+      - ${AIRFLOWDB_SERVICE_NAME}
     volumes:
       - logs:/opt/airflow/logs
       - ./dags:/opt/airflow/dags
