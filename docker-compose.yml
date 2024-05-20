@@ -13,6 +13,17 @@ x-airflow-image: &airflow_image apache/airflow:2.9.0-python3.10
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
+  taxi_db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=${TAXIDB_USER}
+      - POSTGRES_PASSWORD=${TAXIDB_PASSWORD}
+      - POSTGRES_DB=${TAXIDB_NAME}
+    ports:
+      - "5433:5433"
+    volumes:
+      - taxiDB:/var/lib/postgresql/data
+
   ${AIRFLOWDB_SERVICE_NAME}:
     image: postgres:13
     environment:
@@ -33,6 +44,7 @@ services:
     container_name: helloAirflow_init
     restart: always
     depends_on:
+      - taxi_db
       - ${AIRFLOWDB_SERVICE_NAME}
     environment: *airflow_environment
     entrypoint: /bin/bash
@@ -47,6 +59,7 @@ services:
     container_name: helloAirflow_webserver 
     restart: always
     depends_on:
+      - taxi_db
       - ${AIRFLOWDB_SERVICE_NAME}
     ports:
       - "8080:8080"
@@ -64,6 +77,7 @@ services:
     container_name: helloAirflow_scheduler 
     restart: always
     depends_on:
+      - taxi_db
       - ${AIRFLOWDB_SERVICE_NAME}
     volumes:
       - logs:/opt/airflow/logs
@@ -73,5 +87,6 @@ services:
     command: scheduler
 
 volumes:
+  taxiDB:
   airflowDB:
   logs:
