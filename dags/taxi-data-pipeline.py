@@ -99,10 +99,10 @@ def save_weekly_records(ti):
     df = pd.read_csv(csv_file)
 
     # Define the table name
-    table_name = 'your_table_name'
+    table_name = 'taxi_trips'
 
     # Insert the data into the SQL table
-    df.to_sql(table_name, engine, if_exists='replace', index=False)
+    df.to_sql(table_name, engine, if_exists='append', index=False)
 
     return
 
