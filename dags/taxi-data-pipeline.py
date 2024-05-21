@@ -3,6 +3,7 @@ from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import pandas as pd
 import requests
+from sqlalchemy import create_engine
 
 # Define default arguments
 default_args = {
@@ -25,7 +26,7 @@ dag = DAG(
 )
 
 # Define the Python function for data extraction
-def extract_weekly_records(**context):
+def extract_weekly_records(ti, **context):
     execution_date = context['execution_date']
     start_date = execution_date
     end_date = start_date + timedelta(days=7)
@@ -86,6 +87,23 @@ def extract_weekly_records(**context):
     output_filename = f"/tmp/{start_date}_weekly_records.csv"      
     weekly_records.to_csv(output_filename, index=False)
 
+def save_weekly_records(ti):
+    # Database connection URL (example for SQLite)
+    db_url = 'postgresql://taxi:taxi@taxi_db:5433/taxi'
+    engine = create_engine(db_url)
+
+    # Read the CSV file
+    csv_file= ti.xcom_pull(key="weekly_record", task_ids="extract_weekly_records")
+    df = pd.read_csv(csv_file)
+
+    # Define the table name
+    table_name = 'your_table_name'
+
+    # Insert the data into the SQL table
+    df.to_sql(table_name, engine, if_exists='replace', index=False)
+
+    return
+
 extract_trips = PythonOperator(
     task_id='extract_weekly_records',
     python_callable=extract_weekly_records,
@@ -93,6 +111,11 @@ extract_trips = PythonOperator(
     dag=dag,
 )
 
+save_trips = PythonOperator(
+    task_id = 'save_weekly_records',
+    python_callable=save_weekly_records,
+    provide_context=True,
+    dag=dag,
+)
 
-
-extract_task
+extract_task >> save_trips
