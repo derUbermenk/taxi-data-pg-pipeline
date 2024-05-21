@@ -118,4 +118,4 @@ save_trips = PythonOperator(
     dag=dag,
 )
 
-extract_task >> save_trips
+extract_trips >> save_trips
