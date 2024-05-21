@@ -87,13 +87,15 @@ def extract_weekly_records(ti, **context):
     output_filename = f"/tmp/{start_date}_weekly_records.csv"      
     weekly_records.to_csv(output_filename, index=False)
 
+    ti.xcom_push(key="weekly_record_filepath", value=output_filename)
+
 def save_weekly_records(ti):
     # Database connection URL (example for SQLite)
     db_url = 'postgresql://taxi:taxi@taxi_db:5433/taxi'
     engine = create_engine(db_url)
 
     # Read the CSV file
-    csv_file= ti.xcom_pull(key="weekly_record", task_ids="extract_weekly_records")
+    csv_file= ti.xcom_pull(key="weekly_record_filepath", task_ids="extract_weekly_records")
     df = pd.read_csv(csv_file)
 
     # Define the table name
