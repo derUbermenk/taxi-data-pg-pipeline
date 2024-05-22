@@ -2,8 +2,8 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
 import pandas as pd
-import requests
 from sqlalchemy import create_engine
+import numpy as np
 
 # Define default arguments
 default_args = {
@@ -28,9 +28,12 @@ dag = DAG(
 
 # Define the Python function for data extraction
 def extract_weekly_records(ti, **context):
-    execution_date = context['execution_date']
+    execution_date = context['logical_date']
     start_date = execution_date
     end_date = start_date + timedelta(days=7)
+
+    start_date = np.datetime64(start_date)
+    end_date = np.datetime64(end_date)
 
 
     # URL = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-07.csv.gz"
