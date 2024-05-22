@@ -21,7 +21,8 @@ dag = DAG(
     default_args=default_args,
     description='A DAG to extract one week of data from a CSV file',
     schedule_interval='@weekly',  # Use @weekly for the schedule interval
-    start_date=datetime(2023, 1, 1),
+    start_date=datetime(2021, 7, 1),
+    end_date=datetime(2021,8,7)
     catchup=False,
 )
 
@@ -32,7 +33,8 @@ def extract_weekly_records(ti, **context):
     end_date = start_date + timedelta(days=7)
 
 
-    URL = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-07.csv.gz"
+    # URL = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-07.csv.gz"
+    local_file_path = "/data/yellow_tripdata_2021-07.csv.gz"
 
     taxi_dtypes = {
        'VendorID': pd.Int64Dtype(),
@@ -56,17 +58,12 @@ def extract_weekly_records(ti, **context):
     parse_dates = ['tpep_pickup_datetime', 'tpep_dropoff_datetime']
 
     try:
-        # Check if the URL is accessible
-        response = requests.head(URL)
-        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx and 5xx)
+        # Read the gzip compressed CSV file from the local path
+        df = pd.read_csv(local_file_path, sep=",", compression='gzip', dtype=taxi_dtypes, parse_dates=parse_dates)
 
-        # Read the gzip compressed CSV file from the URL
-        df = pd.read_csv(URL, sep=",", compression='gzip', dtype=taxi_dtypes, parse_dates=parse_dates)
-
-    except requests.exceptions.RequestException as e:
-        # Handle URL access issues
-        raise RuntimeError(f"Failed to access URL: {URL}. Error: {e}")
-
+    except FileNotFoundError:
+        # Handle file not found issues
+        raise RuntimeError(f"File not found: {local_file_path}")
 
     # Ensure the 'tpep_pickup_time' column exists
     if 'tpep_pickup_time' not in df.columns:
