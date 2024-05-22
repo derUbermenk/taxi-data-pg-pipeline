@@ -22,7 +22,7 @@ dag = DAG(
     description='A DAG to extract one week of data from a CSV file',
     schedule_interval='@weekly',  # Use @weekly for the schedule interval
     start_date=datetime(2021, 7, 1),
-    end_date=datetime(2021,8,7)
+    end_date=datetime(2021,8,7),
     catchup=False,
 )
 
