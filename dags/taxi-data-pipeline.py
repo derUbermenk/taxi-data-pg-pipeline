@@ -65,15 +65,15 @@ def extract_weekly_records(ti, **context):
         # Handle file not found issues
         raise RuntimeError(f"File not found: {local_file_path}")
 
-    # Ensure the 'tpep_pickup_time' column exists
-    if 'tpep_pickup_time' not in df.columns:
-        raise KeyError("The file does not contain a 'tpep_pickup_time' column.")
+    # Ensure the 'tpep_pickup_datetime' column exists
+    if 'tpep_pickup_datetime' not in df.columns:
+        raise KeyError("The file does not contain a 'tpep_pickup_datetime' column.")
 
-    # Convert the 'tpep_pickup_time' column to datetime
-    df['tpep_pickup_time'] = pd.to_datetime(df['tpep_pickup_time'])
+    # Convert the 'tpep_pickup_datetime' column to datetime
+    df['tpep_pickup_datetime'] = pd.to_datetime(df['tpep_pickup_datetime'])
 
     # Filter the DataFrame to get records from the last week
-    mask = (df['tpep_pickup_time'] >= start_date) & (df['tpep_pickup_time'] < end_date)
+    mask = (df['tpep_pickup_datetime'] >= start_date) & (df['tpep_pickup_datetime'] < end_date)
     weekly_records = df.loc[mask]
 
     weekly_records = weekly_records[weekly_records['passenger_count'] > 0]
