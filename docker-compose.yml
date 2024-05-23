@@ -16,9 +16,9 @@ services:
   taxi_db:
     image: postgres:13
     environment:
-      - POSTGRES_USER=${AIRFLOWDB_USER}
-      - POSTGRES_PASSWORD=${AIRFLOWDB_PASSWORD}
-      - POSTGRES_DB=${AIRFLOWDB_NAME}
+      - POSTGRES_USER=${TAXIDB_USER}
+      - POSTGRES_PASSWORD=${TAXIDB_PASSWORD}
+      - POSTGRES_DB=${TAXIDB_NAME}
     ports:
       - "5433:5433"
     volumes:
