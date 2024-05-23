@@ -90,7 +90,7 @@ def extract_weekly_records(ti, **context):
     ti.xcom_push(key="weekly_record_filepath", value=output_filename)
 
 def save_weekly_records(ti):
-    db_url = 'postgresql://taxi:taxi@taxi_db:5433/taxi'
+    db_url = 'postgresql+psycopg2://taxi:taxi@taxi_db:5433/taxi'
     engine = create_engine(db_url)
 
     # Read the CSV file
