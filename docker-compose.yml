@@ -20,7 +20,7 @@ services:
       - POSTGRES_PASSWORD=${TAXIDB_PASSWORD}
       - POSTGRES_DB=${TAXIDB_NAME}
     ports:
-      - "5433:5433"
+      - "5433:5432"
     volumes:
       - taxiDB:/var/lib/postgresql/data
 
