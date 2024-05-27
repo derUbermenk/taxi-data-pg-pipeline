@@ -99,6 +99,7 @@ services:
     command: scheduler
 
 volumes:
+  pgadmin_data:
   taxiDB:
   airflowDB:
   logs:
