@@ -1,3 +1,4 @@
 .taxi-data-pg-pipeline
 .env
 dags/__pycache__
+data.ipynb
