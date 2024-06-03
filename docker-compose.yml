@@ -13,6 +13,20 @@ x-airflow-image: &airflow_image apache/airflow:2.9.0-python3.10
 # ====================================== /AIRFLOW ENVIRONMENT VARIABLES ======================================
 
 services:
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    ports:
+      - 3000:3000
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: ${TAXIDB_NAME}
+      MB_DB_PORT: 5432
+      MB_DB_USER: ${TAXIDB_USER}
+      MB_DB_PASS: ${TAXIDB_PASSWORD}
+      MB_DB_HOST: taxi_db
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
